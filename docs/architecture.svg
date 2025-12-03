@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" role="img" aria-labelledby="arch-title">
+  <title id="arch-title">bitdrill の構成図。シード付き乱数から出題を生成し、回答を基数ごとの規則で採点する。結果は分野別成績としてlocalStorageに積み上がる。</title>
+  <style>
+    .name { font: 600 14px 'Hiragino Sans', 'Noto Sans JP', sans-serif; fill: #1e1d23; }
+    .file { font: 11px ui-monospace, 'SF Mono', Menlo, monospace; fill: #6b6975; }
+    .desc { font: 11px 'Hiragino Sans', 'Noto Sans JP', sans-serif; fill: #6b6975; }
+    .label { font: 11px 'Hiragino Sans', 'Noto Sans JP', sans-serif; fill: #6b6975; }
+    .caption { font: 12px 'Hiragino Sans', 'Noto Sans JP', sans-serif; fill: #6b6975; }
+    .heading { font: 700 16px 'Hiragino Sans', 'Noto Sans JP', sans-serif; fill: #1e1d23; }
+    .box { fill: #ffffff; stroke: #dddbe3; stroke-width: 1.2; }
+    .box-state { fill: #efe9fd; stroke: #7048e8; }
+    .flow { stroke: #9c99a8; fill: none; stroke-width: 1.6; }
+    .arrow { fill: #9c99a8; }
+    @media (prefers-color-scheme: dark) {
+      .name, .heading { fill: #e8e7ea; }
+      .file, .desc, .label, .caption { fill: #9b99a5; }
+      .box { fill: #1c1b22; stroke: #3b3a45; }
+      .box-state { fill: #2b2342; stroke: #9775fa; }
+      .flow { stroke: #6e6c7a; }
+      .arrow { fill: #6e6c7a; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 8 4 L 0 8 z" class="arrow"/>
+    </marker>
+  </defs>
+
+  <text x="16" y="34" class="heading">bitdrill の構成</text>
+
+  <rect x="16" y="64" width="180" height="80" rx="10" class="box"/>
+  <text x="106" y="88" text-anchor="middle" class="name">乱数</text>
+  <text x="106" y="106" text-anchor="middle" class="file">src/lib/rng.ts</text>
+  <text x="106" y="124" text-anchor="middle" class="desc">シード付きmulberry32</text>
+
+  <rect x="256" y="64" width="210" height="80" rx="10" class="box"/>
+  <text x="361" y="88" text-anchor="middle" class="name">出題と採点</text>
+  <text x="361" y="106" text-anchor="middle" class="file">src/lib/questions.ts</text>
+  <text x="361" y="124" text-anchor="middle" class="desc">7分野の生成・表記揺れの受理</text>
+
+  <rect x="526" y="64" width="180" height="80" rx="10" class="box"/>
+  <text x="616" y="88" text-anchor="middle" class="name">ドリル進行</text>
+  <text x="616" y="106" text-anchor="middle" class="file">src/main.ts</text>
+  <text x="616" y="124" text-anchor="middle" class="desc">設定→10問→結果</text>
+
+  <rect x="766" y="64" width="178" height="80" rx="10" class="box box-state"/>
+  <text x="855" y="88" text-anchor="middle" class="name">分野別成績</text>
+  <text x="855" y="106" text-anchor="middle" class="file">src/lib/stats.ts</text>
+  <text x="855" y="124" text-anchor="middle" class="desc">挑戦数と正答率</text>
+
+  <path d="M 196 104 H 250" class="flow" marker-end="url(#arrow)"/>
+  <path d="M 466 104 H 520" class="flow" marker-end="url(#arrow)"/>
+  <text x="493" y="94" text-anchor="middle" class="label">Question</text>
+  <path d="M 706 104 H 760" class="flow" marker-end="url(#arrow)"/>
+  <text x="733" y="94" text-anchor="middle" class="label">record</text>
+
+  <rect x="526" y="214" width="180" height="60" rx="10" class="box"/>
+  <text x="616" y="238" text-anchor="middle" class="name">localStorage</text>
+  <text x="616" y="256" text-anchor="middle" class="file">src/lib/storage.ts</text>
+
+  <path d="M 855 144 V 244 H 712" class="flow" marker-end="url(#arrow)"/>
+  <text x="800" y="236" text-anchor="middle" class="label">serialize</text>
+  <path d="M 616 214 V 150" class="flow" marker-end="url(#arrow)"/>
+  <text x="626" y="186" class="label">起動時に復元</text>
+
+  <text x="16" y="310" class="caption">出題はシード付き乱数で決定的に再現でき、答えの整合性は問題文を逆解析するテストで全分野を検証している。</text>
+</svg>
