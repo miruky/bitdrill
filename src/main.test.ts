@@ -35,17 +35,32 @@ describe('main', () => {
     }
   });
 
-  it('開始すると1問目が表示される', () => {
+  it('開始すると1問目とマス目ヒントが用意される', () => {
     (document.getElementById('start-button') as HTMLButtonElement).click();
     expect(document.querySelector('.drill-progress')?.textContent).toBe('1 / 10');
     expect(document.querySelector('.drill-prompt')?.textContent).not.toBe('');
+    expect(document.getElementById('hint-body')?.hasAttribute('hidden')).toBe(true);
   });
 
-  it('答えるとフィードバックと解説が出る', () => {
+  it('ヒントは桁の重みを開閉でき、答えは見せない', () => {
+    const toggle = document.getElementById('hint-toggle') as HTMLButtonElement;
+    const body = document.getElementById('hint-body') as HTMLElement;
+    toggle.click();
+    expect(body.hasAttribute('hidden')).toBe(false);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(body.querySelector('.bit-grid')?.innerHTML).toContain('is-ref');
+    expect(body.querySelector('.bit-grid')?.innerHTML).not.toContain('is-on');
+    toggle.click();
+    expect(body.hasAttribute('hidden')).toBe(true);
+  });
+
+  it('答えるとフィードバック・答え・マス目・解説が出る', () => {
     answerCurrent('999999');
     const feedback = document.getElementById('feedback') as HTMLElement;
     expect(feedback.hidden).toBe(false);
     expect(document.getElementById('feedback-result')?.textContent).toBe('不正解');
+    expect(document.getElementById('feedback-answer')?.textContent).toContain('答えは');
+    expect(document.getElementById('feedback-figure')?.querySelector('.bit-grid')).not.toBeNull();
     expect(document.getElementById('feedback-explain')?.textContent).not.toBe('');
   });
 
@@ -57,6 +72,8 @@ describe('main', () => {
     }
     expect(document.querySelector('h2')?.textContent).toContain('結果 0 / 10');
     expect(document.querySelectorAll('.review li').length).toBe(10);
+    // 各設問に答えのマス目が添えられる
+    expect(document.querySelectorAll('.review .bit-grid').length).toBe(10);
 
     (document.getElementById('setup-button') as HTMLButtonElement).click();
     const attempts = [...document.querySelectorAll('.stats-table td:nth-child(2)')]
@@ -67,8 +84,8 @@ describe('main', () => {
 
   it('成績を消すと表が空に戻る', () => {
     (document.getElementById('clear-stats') as HTMLButtonElement).click();
-    const rates = [...document.querySelectorAll('.stats-table td:nth-child(3)')].map(
-      (cell) => cell.textContent,
+    const rates = [...document.querySelectorAll('.stats-table td:nth-child(3)')].map((cell) =>
+      cell.textContent?.trim(),
     );
     expect(rates.every((rate) => rate === '-')).toBe(true);
   });
