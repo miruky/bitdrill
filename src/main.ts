@@ -13,6 +13,11 @@ import {
   type Stats,
 } from './lib/stats';
 import { store } from './lib/storage';
+import {
+  deserialize as readSettings,
+  serialize as writeSettings,
+  type Settings,
+} from './lib/settings';
 import { bitGridSvg, weightStripSvg } from './lib/bits';
 import {
   deserialize as readProfile,
@@ -25,6 +30,7 @@ import {
 
 const STATS_KEY = 'bitdrill:stats';
 const PROFILE_KEY = 'bitdrill:profile';
+const SETTINGS_KEY = 'bitdrill:settings';
 const SET_SIZE = 10;
 const HERO_VALUE = 0xb4; // 1011 0100 = 180、16進では B4
 
@@ -67,10 +73,13 @@ app.innerHTML = `
 
 const stage = document.getElementById('stage') as HTMLElement;
 
+const allCategoryIds: CategoryId[] = categories.map((category) => category.id);
+
 let stats: Stats = readStats(store.getItem(STATS_KEY));
 let profile: Profile = readProfile(store.getItem(PROFILE_KEY));
-let selected: CategoryId[] = categories.map((category) => category.id);
-let bits: 4 | 8 = 8;
+const settings: Settings = readSettings(store.getItem(SETTINGS_KEY), allCategoryIds);
+let selected: CategoryId[] = settings.categories;
+let bits: 4 | 8 = settings.bits;
 let questions: Question[] = [];
 let index = 0;
 let answers: { input: string; correct: boolean }[] = [];
@@ -82,6 +91,10 @@ function saveStats(): void {
 
 function saveProfile(): void {
   store.setItem(PROFILE_KEY, writeProfile(profile));
+}
+
+function saveSettings(): void {
+  store.setItem(SETTINGS_KEY, writeSettings({ categories: selected, bits }));
 }
 
 function esc(text: string): string {
@@ -195,6 +208,7 @@ function renderSetup(): void {
       selected = selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id];
       if (selected.length === 0) selected = [id];
       chip.setAttribute('aria-pressed', String(selected.includes(id)));
+      saveSettings();
     });
   }
   for (const chip of stage.querySelectorAll<HTMLButtonElement>('[data-bits]')) {
@@ -203,6 +217,7 @@ function renderSetup(): void {
       for (const other of stage.querySelectorAll<HTMLButtonElement>('[data-bits]')) {
         other.setAttribute('aria-pressed', String(other === chip));
       }
+      saveSettings();
     });
   }
   stage.querySelector('#start-button')?.addEventListener('click', startSet);
